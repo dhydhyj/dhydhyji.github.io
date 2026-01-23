@@ -8,7 +8,7 @@
         body { background-color: #0e141b; color: white; font-family: -apple-system, sans-serif; margin: 0; padding: 15px; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .nft-card { background: #1c252f; border-radius: 15px; padding: 12px; border: 1px solid #2a3644; text-align: center; }
-        .img-box { width: 100%; aspect-ratio: 1/1; border-radius: 10px; margin-bottom: 10px; background: #2a3644; overflow: hidden; }
+        .img-box { width: 100%; aspect-ratio: 1/1; border-radius: 10px; margin-bottom: 10px; background: #2a3644; display: flex; align-items: center; justify-content: center; overflow: hidden; }
         .img-box img { width: 100%; height: 100%; object-fit: cover; }
         .btn-withdraw { display: block; background: #248bdf; color: white; text-decoration: none; font-size: 14px; font-weight: bold; padding: 12px 0; border-radius: 10px; border: none; width: 100%; cursor: pointer; }
     </style>
@@ -24,13 +24,13 @@
 
         if (id) {
             const title = id.replace(/-/g, ' #');
-            // Пытаемся достать картинку через альтернативный сервер
-            const imgUrl = `https://nft.fragment.com/pendant/${id.split('-')[1]}.webp`; 
+            // Пытаемся взять картинку из разных источников
+            const imgUrl = `https://nft.fragment.com/pendant/${id.split('-')[1] || 'default'}.webp`;
 
             grid.innerHTML = `
                 <div class="nft-card">
                     <div class="img-box">
-                        <img src="${imgUrl}" onerror="this.src='https://t.me/i/nft/${id}.jpg'">
+                        <img src="${imgUrl}" onerror="this.src='https://via.placeholder.com/300/1c252f/ffffff?text=NFT'">
                     </div>
                     <div style="font-weight: bold; font-size: 14px; margin-bottom: 5px;">${title}</div>
                     <div style="font-size: 12px; color: #8a99a8; margin-bottom: 15px;">Collectible</div>
@@ -41,4 +41,3 @@
     </script>
 </body>
 </html>
-
