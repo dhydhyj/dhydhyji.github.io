@@ -1,12 +1,6 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script>
-    window.Telegram.WebApp.expand(); // Разворачивает окно на весь экран
-    window.Telegram.WebApp.ready();
-</script>
-    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EpixGift Inventory</title>
@@ -27,8 +21,32 @@
             grid-template-columns: 1fr 1fr;
             gap: 15px;
         }
+        /* Стиль карточки NFT */
+        .nft-card {
+            background: #1c252f;
+            border-radius: 12px;
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #2a3644;
+            animation: fadeIn 0.5s ease;
+        }
+        .nft-card img {
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        .nft-card span {
+            font-size: 13px;
+            color: #8a99a8;
+            display: block;
+            margin-top: 5px;
+        }
         .empty-state {
             text-align: center; color: #8a99a8; margin-top: 100px; font-size: 16px;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
@@ -45,10 +63,41 @@
     </div>
 
     <script>
-        // Простая проверка: если в сетке есть элементы, убираем надпись "Empty"
-        const grid = document.getElementById('nft-grid');
-        const msg = document.getElementById('empty-msg');
-        if (grid.children.length > 0) msg.style.display = 'none';
+        document.addEventListener("DOMContentLoaded", function() {
+            const grid = document.getElementById('nft-grid');
+            const msg = document.getElementById('empty-msg');
+
+            // 1. Получаем ID предмета из ссылки (например ?item=MoonPendant-40663)
+            const urlParams = new URLSearchParams(window.location.search);
+            const itemID = urlParams.get('item');
+
+            // 2. Если ID найден в ссылке, создаем подарок в инвентаре
+            if (itemID) {
+                // Убираем сообщение о пустом инвентаре
+                msg.style.display = 'none';
+
+                // Создаем контейнер для карточки
+                const card = document.createElement('div');
+                card.className = 'nft-card';
+
+                // Генерируем содержимое. Используем t.me/nft для картинки/анимации
+                // Мы заменяем дефис на пробел и решетку для красивого названия
+                const displayTitle = itemID.replace('-', ' #');
+                
+                card.innerHTML = `
+                    <img src="https://t.me/i/nft/${itemID}.jpg" onerror="this.src='https://via.placeholder.com/150/1c252f/ffffff?text=NFT'">
+                    <div style="font-weight: bold; font-size: 14px;">${displayTitle}</div>
+                    <span>Collectible</span>
+                `;
+
+                grid.appendChild(card);
+            } else {
+                // Если в ссылке ничего нет, проверяем, не пуст ли грид
+                if (grid.children.length === 0) {
+                    msg.style.display = 'block';
+                }
+            }
+        });
     </script>
 </body>
 </html>
